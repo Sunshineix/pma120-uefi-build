@@ -1,4 +1,4 @@
-##
+﻿##
 #
 #  Copyright (c) 2011 - 2022, ARM Limited. All rights reserved.
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
@@ -59,7 +59,7 @@
 
   #
   # Simple Frame Buffer
-  # X9 Ultra 面板（wm size 实测：1440x3168 @ 640dpi，2026-11-07）
+  # X9 Ultra 闈㈡澘锛坵m size 瀹炴祴锛?440x3168 @ 640dpi锛?026-11-07锛?
   #
   gSiliciumPkgTokenSpaceGuid.PcdFrameBufferWidth|1440
   gSiliciumPkgTokenSpaceGuid.PcdFrameBufferHeight|3168
@@ -91,3 +91,4 @@
   # pma120 diagnostics (visible bring-up checkpoints)
   #
   Platforms/OPPO/pma120Pkg/Drivers/Pma120Diag/Pma120Diag.inf
+  Platforms/OPPO/pma120Pkg/Drivers/Pma120XnuDxe/Pma120XnuDxe.inf

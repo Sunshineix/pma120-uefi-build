@@ -1,10 +1,11 @@
 /** @file Pma120XnuDxe.c
  *  pma120 XNU-loader starter.
- *  Finds the XNUP payload at 0xF0000000 (placed there by the GBL wrapper), takes
- *  the "loader.efi" entry out of it, LoadImage+StartImage it. The hakios loader
- *  then builds boot_args and jumps into XNU (or runs its USB command loop).
+ *  The GBL wrapper cannot write 0xF0000000 (unmapped in its page tables), so it
+ *  leaves the XNUP payload at TEMP_PAYLOAD_BASE (0xC6C00000, right behind the
+ *  firmware image). This driver copies the payload to the address the hakios
+ *  loader expects (0xF0000000) and starts the loader out of it: the firmware's
+ *  own MMU maps all of DRAM, so the copy is safe here.
  *
- *  This mirrors the hook in the reference Silicium UEFI that starts the loader.
  *  Copyright (c) 2026, X9U iOS Port Project. All rights reserved.
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  **/
@@ -14,9 +15,12 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/CacheMaintenanceLib.h>
 
-#define PAYLOAD_BASE  0xF0000000ULL
-#define PAYLOAD_MAGIC 0x50554E58u  /* "XNUP" */
+#define TEMP_PAYLOAD_BASE 0xC6C00000ULL
+#define PAYLOAD_BASE      0xF0000000ULL
+#define PAYLOAD_MAGIC     0x50554E58u  /* "XNUP" */
+#define PAYLOAD_MAX       0x04000000u  /* loader.c: PAYLOAD_MAX_SIZE */
 
 typedef struct {
   UINT32 Magic;
@@ -54,20 +58,35 @@ Pma120XnuDxeEntry (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  XNUP_HEADER  *Hdr = (XNUP_HEADER *)(UINTN)PAYLOAD_BASE;
+  XNUP_HEADER  *Hdr;
   UINT8        *P;
   UINT8        *Pend;
   UINT8        *Loader = NULL;
   UINT32        LoaderSize = 0;
   EFI_HANDLE    LoaderHandle = NULL;
   EFI_STATUS    Status;
+  UINT32        Total;
 
+  Hdr = (XNUP_HEADER *)(UINTN)TEMP_PAYLOAD_BASE;
   if (Hdr->Magic != PAYLOAD_MAGIC) {
     DEBUG ((DEBUG_ERROR, "Pma120XnuDxe: no XNUP payload at 0x%lx (magic 0x%x)\n",
-            PAYLOAD_BASE, Hdr->Magic));
+            TEMP_PAYLOAD_BASE, Hdr->Magic));
     return EFI_NOT_FOUND;
   }
 
+  Total = Hdr->Size + sizeof (XNUP_HEADER);
+  if (Total > PAYLOAD_MAX) {
+    DEBUG ((DEBUG_ERROR, "Pma120XnuDxe: payload too big (%u)\n", Total));
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  /* Copy the payload to where the loader looks for it (0xF0000000). */
+  CopyMem ((VOID *)(UINTN)PAYLOAD_BASE, (VOID *)(UINTN)TEMP_PAYLOAD_BASE, Total);
+  WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)PAYLOAD_BASE, Total);
+  DEBUG ((DEBUG_WARN, "Pma120XnuDxe: payload %u bytes moved to 0x%lx\n", Total, PAYLOAD_BASE));
+
+  /* Walk the entries at the destination and find loader.efi. */
+  Hdr  = (XNUP_HEADER *)(UINTN)PAYLOAD_BASE;
   P    = (UINT8 *)(Hdr + 1);
   Pend = P + Hdr->Size;
 
@@ -91,8 +110,7 @@ Pma120XnuDxeEntry (
     return EFI_NOT_FOUND;
   }
 
-  DEBUG ((DEBUG_WARN, "Pma120XnuDxe: starting loader (%u bytes) from 0x%lx\n",
-          LoaderSize, (UINT64)(UINTN)Loader));
+  DEBUG ((DEBUG_WARN, "Pma120XnuDxe: starting loader (%u bytes)\n", LoaderSize));
 
   Status = gBS->LoadImage (FALSE, ImageHandle, NULL, Loader, LoaderSize, &LoaderHandle);
   if (EFI_ERROR (Status)) {

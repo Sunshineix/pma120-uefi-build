@@ -50,7 +50,8 @@ jobs:
         run: |
           export CLANGPDB_AARCH64_PREFIX=aarch64-linux-gnu-
           source ./venv/bin/activate
-          python3 build_uefi.py -d pma120 -r RELEASE -c
+          # DEBUG锛氫笂娓告爲鐨?SEC 闃舵浠呭湪 DEBUG 鐩爣涓嬫槧灏勫甫涓插彛鏋勯€犲嚱鏁扮殑 DebugLib
+          python3 build_uefi.py -d pma120 -r DEBUG -c
 
       - name: Collect artifacts
         run: |

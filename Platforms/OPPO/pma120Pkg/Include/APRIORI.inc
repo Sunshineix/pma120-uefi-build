@@ -92,13 +92,13 @@ INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 INF Binaries/pma120/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UsbDeviceDxe/UsbDeviceDxe.inf
 INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
-  INF Platforms/OPPO/pma120Pkg/Drivers/Pma120XnuDxe/Pma120XnuDxe.inf
-  INF Binaries/pma120/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.inf
+  # [xnu] ButtonsDxe: crashes (PC alignment fault) before XnuDxe can start; skipped
 
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF Binaries/pma120/QcomPkg/Drivers/DisplayDxe/DisplayDxe.inf
 !else
   INF SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe.inf
+  INF Platforms/OPPO/pma120Pkg/Drivers/Pma120XnuDxe/Pma120XnuDxe.inf
 !endif
 
   INF Binaries/pma120/QcomPkg/Drivers/TsensDxe/TsensDxe.inf

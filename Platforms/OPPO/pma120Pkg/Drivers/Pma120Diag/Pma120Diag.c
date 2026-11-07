@@ -81,7 +81,7 @@ Pma120DiagEntry (
   EFI_STATUS  Status;
   EFI_EVENT   TimerEvent = NULL;
 
-  Print (L"PMA120 DXE ALIVE: dispatching v2 heartbeat\n");
+  DEBUG ((EFI_D_WARN, "Pma120Diag: entry, painting splash\n"));
 
   /* Paint immediately. */
   PaintSplash (0);
@@ -100,6 +100,6 @@ Pma120DiagEntry (
     return Status;
   }
 
-  DEBUG ((DEBUG_INFO, "Pma120Diag: heartbeat timer installed\n"));
+  DEBUG ((EFI_D_WARN, "Pma120Diag: heartbeat timer installed\n"));
   return EFI_SUCCESS;
 }

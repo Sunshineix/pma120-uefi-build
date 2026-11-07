@@ -126,8 +126,21 @@ efi_main:
     dsb   sy
     isb
 
-    /* mask IRQs, disable MMU + caches at EL1 */
+    /* ---- mask IRQs, stop timer interrupts, disable GIC, then MMU/caches off ---- */
     msr   daifset, #0xf
+
+    /* Stop the arch timers so no periodic IRQ fires into the firmware's
+       not-yet-installed vector table (GBL's fastboot timers keep ticking). */
+    msr   cntp_ctl_el0, xzr
+    msr   cntv_ctl_el0, xzr
+    isb
+
+    /* Disable the GIC distributor (SM8850 GICD = 0x17000000, per KaanapaliPkg).
+       All interrupt delivery stops until the firmware's ArmGicDxe re-inits. */
+    ldr   x9, =0x17000000
+    str   wzr, [x9]
+    dsb   sy
+
     mrs   x0, sctlr_el1
     bic   x0, x0, #(1 << 0)
     bic   x0, x0, #(1 << 2)

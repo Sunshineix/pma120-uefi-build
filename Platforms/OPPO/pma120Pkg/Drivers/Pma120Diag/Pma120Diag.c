@@ -15,6 +15,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
+#include <Library/CacheMaintenanceLib.h>
 
 #define SPLASH_BASE    0xFC800000ULL
 #define SCREEN_W       1440
@@ -50,6 +51,11 @@ PaintSplash (
       Fb[y * SCREEN_W + x] = Color;
     }
   }
+
+  /* CRITICAL: flush so the display controller actually sees the writes.
+     Without this the paint sits in the CPU cache and never reaches DRAM. */
+  WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)SPLASH_BASE,
+                                     SCREEN_H * SCREEN_W * 4);
 }
 
 STATIC

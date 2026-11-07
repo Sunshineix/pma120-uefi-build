@@ -29,7 +29,7 @@ jobs:
             --target=efi-app-aarch64 GblProbe.so GblProbe.efi
           ls -la GblProbe.efi
           echo "--- PE header check ---"
-          xxd GblProbe.efi | head -8
+          xxd -l 96 GblProbe.efi
 
       - name: Upload probe artifact
         uses: actions/upload-artifact@v4

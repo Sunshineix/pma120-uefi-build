@@ -117,12 +117,10 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *ST)
     UINTN H = Gop->Mode->Info->VerticalResolution;
     UINTN Stride = Gop->Mode->Info->PixelsPerScanLine;
     UINT32 *Fb = (UINT32 *)(UINTN)Gop->Mode->FrameBufferBase;
-    UINT32 *p = Fb;
     for (UINTN y = 0; y < H; y++) {
       UINT32 c = (y < H / 2) ? 0x00FF0000u : 0x000000FFu;
       UINT32 *row = Fb + y * Stride;
       for (UINTN x = 0; x < W; x++) row[x] = c;
-      p = row;
     }
     puts_ascii(ConOut, "GBLPROBE: painted red/blue bands, spinning forever\r\n");
   } else {

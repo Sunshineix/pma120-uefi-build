@@ -108,3 +108,5 @@
   INF Binaries/pma120/QcomPkg/Drivers/PILDxe/PILDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/SPSSDxe/SPSSDxe.inf
+
+  INF Platforms/OPPO/pma120Pkg/Drivers/Pma120Diag/Pma120Diag.inf

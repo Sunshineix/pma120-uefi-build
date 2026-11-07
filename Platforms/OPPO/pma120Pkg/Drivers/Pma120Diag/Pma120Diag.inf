@@ -25,6 +25,7 @@
   UefiBootServicesTableLib
   DebugLib
   UefiLib
+  CacheMaintenanceLib
 
 [Depex]
   TRUE

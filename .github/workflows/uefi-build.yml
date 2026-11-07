@@ -1,17 +1,15 @@
 # X9U-iOS移植项目：pma120 UEFI 固件构建（Mu-Silicium / uefi-sheng）
 # 用法：放在【私有】构建仓库根目录的 .github/workflows/uefi-build.yml 中。
-# 该私有仓库 = uefi-sheng 导入 + Platforms/OPPO/pma120Pkg + Resources/{Configs,DTBs}/pma120.* + Binaries/pma120（vendor 驱动，仅私有仓库）。
+# 该私有仓库 = uefi-sheng 文件 + Platforms/OPPO/pma120Pkg + Resources/{Configs,DTBs}/pma120.* + Binaries/pma120（vendor 驱动，仅私有仓库）。
+#
+# 注意：私有仓库由 Contents API 逐文件上传组装，树里没有子模块 gitlink，所以：
+#   - 公开子模块树（Mu_Basecore 等）在构建时显式克隆（本工作流）；
+#   - 只保留 workflow_dispatch 触发（上传过程会产生上千个 commit，不能每个都触发构建）。
 # 详见 X9U-iOS移植/UEFI构建runbook.md。
 name: uefi-build (pma120)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-
-concurrency:
-  group: uefi-build-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -19,12 +17,20 @@ jobs:
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
+      - name: Clone the public Mu-Silicium submodule trees (this build repo carries no gitlinks)
+        run: |
+          git clone -q --depth 1 --branch release/202608 https://github.com/microsoft/mu_plus.git Common/Mu
+          git clone -q --depth 1 --branch release/202608 https://github.com/microsoft/mu_oem_sample.git Common/Mu_OEM_Sample
+          git clone -q --depth 1 --branch release/202608 https://github.com/microsoft/mu_basecore.git Mu_Basecore
+          git clone -q --depth 1 https://github.com/Project-Silicium/Silicium-ACPI.git Silicium-ACPI
+          mkdir -p Silicon/Silicium/OpensslPkg/Library/OpensslLib
+          git init -q Silicon/Silicium/OpensslPkg/Library/OpensslLib/openssl
+          git -C Silicon/Silicium/OpensslPkg/Library/OpensslLib/openssl remote add origin https://github.com/openssl/openssl.git
+          git -C Silicon/Silicium/OpensslPkg/Library/OpensslLib/openssl fetch -q --depth 1 origin 67b5686b4419b4cb8caa502711c41815f5279751
+          git -C Silicon/Silicium/OpensslPkg/Library/OpensslLib/openssl checkout -q FETCH_HEAD
 
       - name: Install host tools (setup_env.sh apt set)
-        env:
-          CI_BUILD: "false"
         run: |
           sudo apt-get update
           sudo apt-get install -y pip git mono-devel build-essential lld uuid-dev nasm \

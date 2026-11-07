@@ -22,6 +22,7 @@
 #define SCREEN_H       3168
 
 STATIC UINTN  mPattern = 0;
+STATIC UINTN  mTicks = 0;
 
 STATIC
 VOID
@@ -66,9 +67,28 @@ PaintTick (
   IN VOID      *Context
   )
 {
-  PaintSplash ((UINT32)mPattern);
+  mTicks++;
+
+  /* After 5 animation frames (~10s), clear the screen and stop the timer so
+     the console text stays readable for on-screen crash-point capture. */
+  if (mTicks >= 6) {
+    UINT32 *Fb = (UINT32 *)(UINTN)SPLASH_BASE;
+    UINTN   x, y;
+    for (y = 0; y < SCREEN_H; y++) {
+      for (x = 0; x < SCREEN_W; x++) {
+        Fb[y * SCREEN_W + x] = 0x00000000;
+      }
+    }
+    WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)SPLASH_BASE,
+                                       SCREEN_H * SCREEN_W * 4);
+    DEBUG ((EFI_D_WARN, "Pma120Diag: animation done, screen cleared\n"));
+    gBS->SetTimer (Event, TimerCancel, 0);
+    return;
+  }
+
+  PaintSplash ((UINT32)(mTicks % 3));
   mPattern = (mPattern + 1) % 3;
-  DEBUG ((DEBUG_INFO, "Pma120Diag: heartbeat pattern=%u\n", mPattern));
+  DEBUG ((EFI_D_WARN, "Pma120Diag: heartbeat pattern=%u\n", mTicks % 3));
 }
 
 EFI_STATUS

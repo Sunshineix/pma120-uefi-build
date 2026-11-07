@@ -28,5 +28,8 @@
   BaseMemoryLib
   CacheMaintenanceLib
 
+[Protocols]
+  gEfiGraphicsOutputProtocolGuid
+
 [Depex]
   TRUE

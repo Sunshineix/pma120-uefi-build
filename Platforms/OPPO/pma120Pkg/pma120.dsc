@@ -86,3 +86,8 @@
   # ACPI Tables
   #
   #pma120/AcpiTables.inf
+
+  #
+  # pma120 diagnostics (visible bring-up checkpoints)
+  #
+  Platforms/OPPO/pma120Pkg/Drivers/Pma120Diag/Pma120Diag.inf

@@ -17,6 +17,17 @@ _StackSize:
 #endif
 
 _Start:
+  /* X9U-IOS DIAG: paint the whole framebuffer red (0xFC800000, 32bpp, 1440x3168).
+     A red screen proves BootShim ran; no change means the bootloader never executed it. */
+  ldr   x9,  =0xFC800000
+  ldr   x10, =0xFFFF0000
+  ldr   x11, =0x459C00        /* 1440*3168 = 4561920 pixels */
+  mov   x12, x10
+1:
+  stp   x10, x12, [x9], #16
+  subs  x11, x11, #2
+  b.ne  1b
+
   mov   x4, x1
   ldr   x5, =FD_BASE
   cmp   x4, x5

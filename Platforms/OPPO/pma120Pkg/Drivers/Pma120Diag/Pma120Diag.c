@@ -10,6 +10,7 @@
 #include <Uefi.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
 #include <Library/PrintLib.h>
 #include <Protocol/GraphicsOutput.h>
 

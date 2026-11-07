@@ -1,4 +1,4 @@
-/* BootstrapFdXnu.S 鈥?carrier for booting our Mu-Silicium UEFI firmware with the
+/* BootstrapFdXnu.S 閳?carrier for booting our Mu-Silicium UEFI firmware with the
  * XNUP payload in RAM (for the firmware's Pma120XnuDxe to start the loader).
  *
  * Color markers (final color on screen = how far it got):
@@ -12,7 +12,7 @@
  */
 #define FD_BASE      0xC6900000
 #define FD_SIZE      0x00300000
-#define PAYLOAD_BASE 0xC6C00000   /* mapped in GBL's page tables (0xF0000000 is NOT); the firmware copies it to 0xF0000000 */
+#define PAYLOAD_BASE 0xC7800000   /* the firmware's reserved Kernel region: mapped by both GBL and the firmware */
 #define SPLASH       0xFC800000
 #define NPIX         0x459C00
 

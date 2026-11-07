@@ -1,12 +1,6 @@
-# X9U-iOS移植项目：pma120 UEFI 固件构建（Mu-Silicium / uefi-sheng）
-# 用法：放在【私有】构建仓库根目录的 .github/workflows/uefi-build.yml 中。
-# 该私有仓库 = uefi-sheng 文件 + Platforms/OPPO/pma120Pkg + Resources/{Configs,DTBs}/pma120.* + Binaries/pma120（vendor 驱动，仅私有仓库）。
-#
-# 注意：私有仓库由 Contents API 逐文件上传组装，树里没有子模块 gitlink，所以：
-#   - 公开子模块树（Mu_Basecore 等）在构建时显式克隆（本工作流）；
-#   - 只保留 workflow_dispatch 触发（上传过程会产生上千个 commit，不能每个都触发构建）。
-# 详见 X9U-iOS移植/UEFI构建runbook.md。
-name: uefi-build (pma120)
+# X9U-iOS绉绘椤圭洰锛歱ma120 UEFI 鍥轰欢鏋勫缓锛圡u-Silicium / uefi-sheng锛?# 鐢ㄦ硶锛氭斁鍦ㄣ€愮鏈夈€戞瀯寤轰粨搴撴牴鐩綍鐨?.github/workflows/uefi-build.yml 涓€?# 璇ョ鏈変粨搴?= uefi-sheng 鏂囦欢 + Platforms/OPPO/pma120Pkg + Resources/{Configs,DTBs}/pma120.* + Binaries/pma120锛坴endor 椹卞姩锛屼粎绉佹湁浠撳簱锛夈€?#
+# 娉ㄦ剰锛氱鏈変粨搴撶敱 Contents API 閫愭枃浠朵笂浼犵粍瑁咃紝鏍戦噷娌℃湁瀛愭ā鍧?gitlink锛屾墍浠ワ細
+#   - 鍏紑瀛愭ā鍧楁爲锛圡u_Basecore 绛夛級鍦ㄦ瀯寤烘椂鏄惧紡鍏嬮殕锛堟湰宸ヤ綔娴侊級锛?#   - 鍙繚鐣?workflow_dispatch 瑙﹀彂锛堜笂浼犺繃绋嬩細浜х敓涓婂崈涓?commit锛屼笉鑳芥瘡涓兘瑙﹀彂鏋勫缓锛夈€?# 璇﹁ X9U-iOS绉绘/UEFI鏋勫缓runbook.md銆?name: uefi-build (pma120)
 
 on:
   workflow_dispatch:
@@ -42,8 +36,9 @@ jobs:
           D=Mu_Basecore/BaseTools/Bin/mu_nasm_extdep
           mkdir -p $D/Linux-x86-64
           echo 'version: 20016.1.1' > $D/extdep_state.yaml
-          ln -s /usr/bin/nasm /usr/bin/ndisasm $D/Linux-x86-64/ || true
-          ln -sf /usr/bin/nasm /usr/bin/ndisasm
+          ln -sf /usr/bin/nasm $D/Linux-x86-64/nasm
+          ln -sf /usr/bin/ndisasm $D/Linux-x86-64/ndisasm
+          sudo ln -sf /usr/bin/nasm /usr/bin/ndisasm
 
       - name: Python requirements
         run: |

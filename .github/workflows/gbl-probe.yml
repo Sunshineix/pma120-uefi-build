@@ -37,6 +37,8 @@ jobs:
           ls -la GblProbe.efi
           echo "--- PE header ---"
           xxd -l 96 GblProbe.efi
+          echo "--- efi_main disassembly (verify PC-relative addressing) ---"
+          aarch64-linux-gnu-objdump -d GblProbe.so | sed -n '/<efi_main>/,+70p'
 
       - name: Upload probe artifact
         uses: actions/upload-artifact@v4

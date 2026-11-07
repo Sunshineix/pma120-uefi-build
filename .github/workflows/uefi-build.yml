@@ -1,0 +1,67 @@
+# X9U-iOS移植项目：pma120 UEFI 固件构建（Mu-Silicium / uefi-sheng）
+# 用法：放在【私有】构建仓库根目录的 .github/workflows/uefi-build.yml 中。
+# 该私有仓库 = uefi-sheng 导入 + Platforms/OPPO/pma120Pkg + Resources/{Configs,DTBs}/pma120.* + Binaries/pma120（vendor 驱动，仅私有仓库）。
+# 详见 X9U-iOS移植/UEFI构建runbook.md。
+name: uefi-build (pma120)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: uefi-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install host tools (setup_env.sh apt set)
+        env:
+          CI_BUILD: "false"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pip git mono-devel build-essential lld uuid-dev nasm \
+            gcc-aarch64-linux-gnu python3 python3-git python3-pip gettext locales gnupg \
+            ca-certificates python3-venv git-core clang llvm curl
+
+      - name: mu_nasm extdep shim (use system nasm, no Mono NuGet fetch)
+        run: |
+          D=Mu_Basecore/BaseTools/Bin/mu_nasm_extdep
+          mkdir -p $D/Linux-x86-64
+          echo 'version: 20016.1.1' > $D/extdep_state.yaml
+          ln -s /usr/bin/nasm /usr/bin/ndisasm $D/Linux-x86-64/ || true
+          ln -sf /usr/bin/nasm /usr/bin/ndisasm
+
+      - name: Python requirements
+        run: |
+          python3 -m venv venv
+          ./venv/bin/pip install --upgrade pip
+          ./venv/bin/pip install -r pip-requirements.txt
+
+      - name: Build UEFI firmware for pma120
+        run: |
+          export CLANGPDB_AARCH64_PREFIX=aarch64-linux-gnu-
+          source ./venv/bin/activate
+          python3 build_uefi.py -d pma120 -r RELEASE -c
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p artifacts
+          cp Build/pma120Pkg/RELEASE_CLANGPDB/FV/SILICIUM_UEFI.fd artifacts/ 2>/dev/null || \
+            find Build/pma120Pkg -name '*.fd' -exec cp {} artifacts/ \;
+          cp Mu-pma120.img artifacts/ 2>/dev/null || true
+          ls -la artifacts
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: pma120-uefi
+          path: artifacts/
+          retention-days: 7

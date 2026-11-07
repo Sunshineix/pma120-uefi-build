@@ -23,6 +23,7 @@
 [LibraryClasses]
   UefiDriverEntryPoint
   UefiBootServicesTableLib
+  UefiLib
   DebugLib
   PrintLib
 

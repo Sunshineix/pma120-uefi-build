@@ -33,6 +33,41 @@ typedef EFI_STATUS (*EFI_IMAGE_LOAD)(UINT8 BootPolicy, EFI_HANDLE ParentImageHan
                                      UINTN SourceSize, EFI_HANDLE *ImageHandle);
 typedef EFI_STATUS (*EFI_IMAGE_START)(EFI_HANDLE ImageHandle, UINTN *ExitDataSize,
                                       UINT16 **ExitData);
+typedef EFI_STATUS (*EFI_LOCATE_PROTOCOL)(EFI_GUID *, VOID *, VOID **);
+
+typedef struct {
+  UINT32 Data1;
+  UINT16 Data2;
+  UINT16 Data3;
+  UINT8  Data4[8];
+} EFI_GUID;
+
+/* QCOM_USB_DEVICE_GUID: d9d9ce48-44b8-4f49-8e3e-2a3b927dc6c1 */
+static const EFI_GUID UsbDeviceGuid = {
+  0xd9d9ce48, 0x44b8, 0x4f49,
+  { 0x8e, 0x3e, 0x2a, 0x3b, 0x92, 0x7d, 0xc6, 0xc1 }
+};
+
+/* EFI_USB_DEVICE_PROTOCOL (QcomPkg EFIUsbDevice.h): polled peripheral-mode API.
+   stop at offset 48: deconfigures the controller that GBL's fastboot left started. */
+typedef struct {
+  UINT64      Revision;
+  VOID       *Start;
+  VOID       *Send;
+  VOID       *HandleEvent;
+  VOID       *AllocateTransferBuffer;
+  VOID       *FreeTransferBuffer;
+  EFI_STATUS (*Stop)(VOID);
+} USB_DEVICE_PROTOCOL;
+
+static void UsbRelease(EFI_SYSTEM_TABLE *ST)
+{
+  EFI_LOCATE_PROTOCOL Locate = *(EFI_LOCATE_PROTOCOL *)((UINT8 *)ST->BootServices + 296);
+  USB_DEVICE_PROTOCOL *Usb = 0;
+  if (Locate((EFI_GUID *)&UsbDeviceGuid, 0, (VOID **)&Usb) == 0 && Usb != 0 && Usb->Stop != 0) {
+    Usb->Stop();
+  }
+}
 
 #define SPLASH       0xFC800000ULL
 #define SCREEN_W     1440
@@ -86,7 +121,11 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *ST)
   len = (UINTN)(PayloadEnd - PayloadImage);
   CacheFlushRange((VOID *)(UINTN)PAYLOAD_BASE, len);
 
-  /* 3. LoadImage + StartImage the loader */
+  /* 3. release the USB controller GBL's fastboot left started, so the
+        loader's own start_ex() can configure it. */
+  UsbRelease(ST);
+
+  /* 4. LoadImage + StartImage the loader */
   Load  = *(EFI_IMAGE_LOAD *)((UINT8 *)ST->BootServices + 176);
   Start = *(EFI_IMAGE_START *)((UINT8 *)ST->BootServices + 184);
 

@@ -19,16 +19,23 @@ jobs:
         run: |
           set -euo pipefail
           cd probe
-          aarch64-linux-gnu-gcc -c -ffreestanding -fno-stack-protector -fPIC \
+          aarch64-linux-gnu-gcc -c -ffreestanding -fno-stack-protector \
+            -fno-asynchronous-unwind-tables -fno-unwind-tables -fpic \
             -mstrict-align -g0 -O2 -Wall GblProbe.c -o GblProbe.o
           aarch64-linux-gnu-gcc -c crt0.S -o crt0.o
           aarch64-linux-gnu-ld -shared -Bsymbolic -T gblprobe.lds \
             crt0.o GblProbe.o -o GblProbe.so
-          aarch64-linux-gnu-objcopy -j .text -j .rodata -j .data \
-            -j .got -j .dynamic -j .rela -j .reloc \
-            --target=efi-app-aarch64 GblProbe.so GblProbe.efi
+          echo "--- ELF sections ---"
+          aarch64-linux-gnu-readelf -S GblProbe.so | head -30
+          echo "--- objcopy ---"
+          aarch64-linux-gnu-objcopy -j .text -j .data -j .rodata \
+            -j .dynamic -j .rela -j .reloc \
+            --target=efi-app-aarch64 GblProbe.so GblProbe.efi \
+            || aarch64-linux-gnu-objcopy -j .text -j .data -j .rodata \
+               -j .dynamic -j .reloc \
+               --target=efi-app-aarch64 GblProbe.so GblProbe.efi
           ls -la GblProbe.efi
-          echo "--- PE header check ---"
+          echo "--- PE header ---"
           xxd -l 96 GblProbe.efi
 
       - name: Upload probe artifact

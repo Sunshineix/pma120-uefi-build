@@ -42,7 +42,7 @@ APRIORI DXE {
 
   INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 
-  INF Binaries/pma120/QcomPkg/Drivers/PmicDxe/PmicDxeLa.inf
+  # [xnu] PmicDxeLa crashes (PC alignment fault) before XnuDxe gets to run; not force-dispatched
   INF Binaries/pma120/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   INF Binaries/pma120/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 

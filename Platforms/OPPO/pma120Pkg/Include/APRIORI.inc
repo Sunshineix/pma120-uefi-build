@@ -1,4 +1,4 @@
-APRIORI DXE {
+﻿APRIORI DXE {
   INF MdeModulePkg/Core/Dxe/DxeMain.inf
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF QcomPkg/Drivers/IortDtDxe/IortDtDxe.inf
@@ -78,26 +78,27 @@ APRIORI DXE {
 
   INF Binaries/pma120/QcomPkg/Drivers/SPIDxe/SPIDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/PmicGlinkDxe/PmicGlinkSoccpDxe.inf
-  INF Binaries/pma120/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
+# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/QcomChargerDxe/QcomChargerDxeLAGio.inf
   INF Binaries/pma120/QcomPkg/Drivers/ChargerExDxe/ChargerExDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UsbfnDwc3Dxe/UsbfnDwc3Dxe.inf
-  INF Binaries/pma120/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.inf
-  INF Binaries/pma120/QcomPkg/Drivers/XhciDxe/XhciDxe.inf
+# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.inf
+# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/XhciDxe/XhciDxe.inf
 
-  INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-  INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-  INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+# [xnu-test] INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+# [xnu-test] INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+# [xnu-test] INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-  INF Binaries/pma120/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
+# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UsbDeviceDxe/UsbDeviceDxe.inf
-  INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
+# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.inf
 
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF Binaries/pma120/QcomPkg/Drivers/DisplayDxe/DisplayDxe.inf
 !else
   INF SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe.inf
+  INF Platforms/OPPO/pma120Pkg/Drivers/Pma120XnuDxe/Pma120XnuDxe.inf
 !endif
 
   INF Binaries/pma120/QcomPkg/Drivers/TsensDxe/TsensDxe.inf

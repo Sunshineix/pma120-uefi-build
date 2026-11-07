@@ -57,7 +57,7 @@ class SettingsManager (UpdateSettingsManager, SetupSettingsManager, PrEvalSettin
 
     def GetRequiredSubmodules (self):
         return [
-            RequiredSubmodule ("Binaries", True),
+            # X9U-iOS: Binaries 涓嶅啀鏄瓙妯″潡锛坴endor 椹卞姩浠ユ櫘閫氭枃浠堕殢浠撳簱鍒嗗彂锛?
             RequiredSubmodule ("Common/Mu", True),
             RequiredSubmodule ("Common/Mu_OEM_Sample", True),
             RequiredSubmodule ("Mu_Basecore", True),

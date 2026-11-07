@@ -1,0 +1,44 @@
+name: gbl-xnu (XNUP payload + loader bootstrap)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-xnu-bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install ARM64 cross toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gcc-aarch64-linux-gnu
+
+      - name: Compile BootstrapXnu.efi
+        run: |
+          set -euo pipefail
+          cd probe
+          ls -la
+          aarch64-linux-gnu-gcc -c -ffreestanding -fno-stack-protector \
+            -fno-asynchronous-unwind-tables -fno-unwind-tables -fpic \
+            -mstrict-align -g0 -O2 -Wall BootstrapXnu.c -o BootstrapXnu.o
+          aarch64-linux-gnu-gcc -c crt0.S -o crt0.o
+          aarch64-linux-gnu-gcc -c BootstrapXnuData.S -o BootstrapXnuData.o
+          aarch64-linux-gnu-ld -shared -Bsymbolic -T gblprobe.lds \
+            crt0.o BootstrapXnu.o BootstrapXnuData.o -o BootstrapXnu.so
+          aarch64-linux-gnu-objcopy -j .text -j .data -j .rodata \
+            -j .dynamic -j .rela -j .reloc -j .payload -j .loader \
+            --target=efi-app-aarch64 BootstrapXnu.so BootstrapXnu.efi \
+            || aarch64-linux-gnu-objcopy -j .text -j .data -j .rodata \
+               -j .dynamic -j .reloc -j .payload -j .loader \
+               --target=efi-app-aarch64 BootstrapXnu.so BootstrapXnu.efi
+          ls -la BootstrapXnu.efi
+          echo "--- PE header ---"
+          xxd -l 96 BootstrapXnu.efi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gbl-xnu-bootstrap
+          path: probe/BootstrapXnu.efi

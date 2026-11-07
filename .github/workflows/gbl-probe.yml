@@ -15,33 +15,32 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq gcc-aarch64-linux-gnu
 
-      - name: Compile GblProbe.efi
+      - name: Compile Bootstrap.efi (FD chainloader)
         run: |
           set -euo pipefail
           cd probe
-          aarch64-linux-gnu-gcc -c -ffreestanding -fno-stack-protector \
-            -fno-asynchronous-unwind-tables -fno-unwind-tables -fpic \
-            -mstrict-align -g0 -O2 -Wall GblProbe.c -o GblProbe.o
+          ls -la
           aarch64-linux-gnu-gcc -c crt0.S -o crt0.o
+          aarch64-linux-gnu-gcc -c Bootstrap.S -o Bootstrap.o
           aarch64-linux-gnu-ld -shared -Bsymbolic -T gblprobe.lds \
-            crt0.o GblProbe.o -o GblProbe.so
+            crt0.o Bootstrap.o -o Bootstrap.so
           echo "--- ELF sections ---"
-          aarch64-linux-gnu-readelf -S GblProbe.so | head -30
+          aarch64-linux-gnu-readelf -S Bootstrap.so | head -30
           echo "--- objcopy ---"
           aarch64-linux-gnu-objcopy -j .text -j .data -j .rodata \
-            -j .dynamic -j .rela -j .reloc \
-            --target=efi-app-aarch64 GblProbe.so GblProbe.efi \
+            -j .dynamic -j .rela -j .reloc -j .fd \
+            --target=efi-app-aarch64 Bootstrap.so Bootstrap.efi \
             || aarch64-linux-gnu-objcopy -j .text -j .data -j .rodata \
-               -j .dynamic -j .reloc \
-               --target=efi-app-aarch64 GblProbe.so GblProbe.efi
-          ls -la GblProbe.efi
+               -j .dynamic -j .reloc -j .fd \
+               --target=efi-app-aarch64 Bootstrap.so Bootstrap.efi
+          ls -la Bootstrap.efi
           echo "--- PE header ---"
-          xxd -l 96 GblProbe.efi
-          echo "--- efi_main disassembly (verify PC-relative addressing) ---"
-          aarch64-linux-gnu-objdump -d GblProbe.so | sed -n '/<efi_main>/,+70p'
+          xxd -l 96 Bootstrap.efi
+          echo "--- bootstrap disasm ---"
+          aarch64-linux-gnu-objdump -d Bootstrap.so | sed -n '/<efi_main>/,+40p'
 
       - name: Upload probe artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gbl-probe
-          path: probe/GblProbe.efi
+          name: gbl-bootstrap
+          path: probe/Bootstrap.efi

@@ -15,13 +15,13 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq gcc-aarch64-linux-gnu
 
-      - name: Compile Bootstrap.efi (FD chainloader)
+      - name: Compile Bootstrap.efi (FD chainloader + verification)
         run: |
           set -euo pipefail
           cd probe
           ls -la
           aarch64-linux-gnu-gcc -c crt0.S -o crt0.o
-          aarch64-linux-gnu-gcc -c Bootstrap.S -o Bootstrap.o
+          aarch64-linux-gnu-gcc -c BootstrapVerify.S -o Bootstrap.o
           aarch64-linux-gnu-ld -shared -Bsymbolic -T gblprobe.lds \
             crt0.o Bootstrap.o -o Bootstrap.so
           echo "--- ELF sections ---"

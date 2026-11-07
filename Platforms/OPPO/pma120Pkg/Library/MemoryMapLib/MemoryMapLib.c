@@ -44,9 +44,10 @@ gMemoryDescriptor[] = {
   {"Global_SYNC",        0xD7A00000, 0x00200000, AddMem, MEM_RES, UNCACHEABLE, Reserv, UNCACHED_UNBUFFERED_XN},
   {"Display_Reserved",   0xFC800000, 0x02B00000, AddMem, MEM_RES, SYS_MEM_CAP, Reserv, WRITE_THROUGH_XN},
   {"LLCC_LPI",           0xFF800000, 0x00800000, AddMem, MEM_RES, UNCACHEABLE, Reserv, UNCACHED_UNBUFFERED_XN},
-  // 12 GiB of DRAM above 4 GiB: the phone has 16 GiB; the XNU loader needs a large
-  // contiguous ConventionalMemory block for the kernel window (2026-11-08: only 128 MiB was free).
-  {"DRAM_HI",            0x100000000, 0x300000000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN},
+  // 256 MiB of DRAM above 4 GiB: the XNU loader needs a contiguous ConventionalMemory
+  // block of ~130 MiB for the kernel window (the 4 GiB map leaves only 128 MiB: 2 MiB short).
+  // 256 MiB costs 128 ARM page-table entries, which the 12 KiB MMU page-table pool holds.
+  {"DRAM_HI",            0x100000000, 0x10000000, AddMem, SYS_MEM, SYS_MEM_CAP, Conv,   WRITE_BACK_XN},
 
   // Other Memory Regions
   {"IMEM_Cookie_Base",   0x14680000, 0x00001000, AddDev, MMAP_IO, INITIALIZED, Conv,   NS_DEVICE},

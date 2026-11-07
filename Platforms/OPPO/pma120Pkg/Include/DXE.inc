@@ -89,21 +89,21 @@
   #INF Binaries/pma120/QcomPkg/Drivers/GLinkDxe/GLinkDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/PmicGlinkDxe/PmicGlinkSoccpDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/QcomChargerDxe/QcomChargerDxeLAGio.inf
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/TsensDxe/TsensDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/DDRInfoDxe/DDRInfoDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UsbfnDwc3Dxe/UsbfnDwc3Dxe.inf
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.inf
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/XhciDxe/XhciDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/XhciDxe/XhciDxe.inf
 
-# [xnu-test] INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-# [xnu-test] INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-# [xnu-test] INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UsbDeviceDxe/UsbDeviceDxe.inf
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbInitDxe/UsbInitDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/UsbInitDxe/UsbInitDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UCDxe/UCDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/RNGDxe/RngDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/PILDxe/PILDxe.inf

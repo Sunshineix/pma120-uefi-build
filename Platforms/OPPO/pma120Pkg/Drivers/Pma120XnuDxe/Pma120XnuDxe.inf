@@ -1,0 +1,30 @@
+## @file Pma120XnuDxe.inf
+#  pma120 XNU-loader starter: takes loader.efi out of the XNUP payload at
+#  0xF0000000 and starts it (the hook the reference Silicium UEFI has).
+#  Copyright (c) 2026, X9U iOS Port Project. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Pma120XnuDxe
+  FILE_GUID                      = 7A2B4C6D-8E0F-4A1B-9C2D-3E4F5A6B7C8D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Pma120XnuDxeEntry
+
+[Sources]
+  Pma120XnuDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  UefiLib
+
+[Depex]
+  TRUE

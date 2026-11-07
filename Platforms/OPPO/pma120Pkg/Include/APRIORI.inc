@@ -64,7 +64,7 @@ APRIORI DXE {
   #INF Binaries/pma120/QcomPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
   #INF Binaries/pma120/QcomPkg/Drivers/PILDxe/PILDxe.inf
   #INF Binaries/pma120/QcomPkg/Drivers/SPSSDxe/SPSSDxe.inf
-  #INF Binaries/pma120/QcomPkg/Drivers/GLinkDxe/GLinkDxe.inf
+  INF Binaries/pma120/QcomPkg/Drivers/GLinkDxe/GLinkDxe.inf
 
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
@@ -91,8 +91,9 @@ INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
 INF Binaries/pma120/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UsbDeviceDxe/UsbDeviceDxe.inf
-INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
-  INF Platforms/OPPO/pma120Pkg/Drivers/Pma120XnuDxe/Pma120XnuDxe.inf
+#INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
+  INF Binaries/pma120/QcomPkg/Drivers/UsbInitDxe/UsbInitDxe.inf
+INF Platforms/OPPO/pma120Pkg/Drivers/Pma120XnuDxe/Pma120XnuDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.inf
 
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1

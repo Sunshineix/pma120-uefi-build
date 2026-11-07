@@ -1,14 +1,14 @@
 /* BootstrapFdXnu.S — carrier for booting our Mu-Silicium UEFI firmware with the
- * XNUP payload in RAM, so the firmware's Pma120XnuDxe can start the hakios loader
- * from it (a clean EFI environment with a free USB controller, like the
- * reference Silicium UEFI flow).
+ * XNUP payload in RAM (for the firmware's Pma120XnuDxe to start the loader).
  *
- * Steps:
- *   1. paint the splash orange
- *   2. copy the embedded FD to FD_BASE (0xC6900000)
- *   3. copy the embedded XNUP payload to PAYLOAD_BASE (0xF0000000)
- *   4. clean caches; stop arch timers; disable the GIC distributor
- *   5. disable MMU + caches, jump to the FD (SEC entry)
+ * Color markers (final color on screen = how far it got):
+ *   ORANGE = wrapper entered
+ *   BLUE   = FD copied to 0xC6900000
+ *   GREEN  = payload copied to 0xF0000000
+ *   (no color change after ORANGE means the FD copy faulted;
+ *    ORANGE->BLUE only means the payload write faulted)
+ *
+ * Then: clean caches, stop timers, disable GIC, MMU off, jump to the FD.
  */
 #define FD_BASE      0xC6900000
 #define FD_SIZE      0x00300000
@@ -37,7 +37,7 @@ PayloadEnd:
     .global efi_main
     .type   efi_main,%function
 efi_main:
-    /* 1. orange */
+    /* ORANGE: entered */
     ldr   x9,  =SPLASH
     ldr   x10, =0x00FF8000
     ldr   x11, =NPIX
@@ -47,7 +47,7 @@ efi_main:
     subs  x11, x11, #2
     b.ne  1b
 
-    /* 2. copy FD to FD_BASE */
+    /* copy FD to FD_BASE */
     adrp  x0, FdImage
     add   x0, x0, :lo12:FdImage
     adrp  x1, FdEnd
@@ -59,23 +59,43 @@ efi_main:
     stp   x5, x6, [x2], #16
     cmp   x4, x1
     b.lo  2b
+    dsb   sy
 
-    /* 3. copy the XNUP payload to PAYLOAD_BASE */
+    /* BLUE: FD copied */
+    ldr   x9,  =SPLASH
+    ldr   x10, =0x000000FF
+    ldr   x11, =NPIX
+    mov   x12, x10
+3:
+    stp   x10, x12, [x9], #16
+    subs  x11, x11, #2
+    b.ne  3b
+
+    /* copy the XNUP payload to PAYLOAD_BASE */
     adrp  x0, PayloadImage
     add   x0, x0, :lo12:PayloadImage
     adrp  x1, PayloadEnd
     add   x1, x1, :lo12:PayloadEnd
     ldr   x2, =PAYLOAD_BASE
     mov   x4, x0
-3:
+4:
     ldp   x5, x6, [x4], #16
     stp   x5, x6, [x2], #16
     cmp   x4, x1
-    b.lo  3b
-
+    b.lo  4b
     dsb   sy
 
-    /* 4a. clean the FD range to PoC */
+    /* GREEN: payload copied */
+    ldr   x9,  =SPLASH
+    ldr   x10, =0x0000FF00
+    ldr   x11, =NPIX
+    mov   x12, x10
+5:
+    stp   x10, x12, [x9], #16
+    subs  x11, x11, #2
+    b.ne  5b
+
+    /* clean FD range to PoC */
     ldr   x9,  =FD_BASE
     ldr   x10, =FD_SIZE
     add   x10, x9, x10
@@ -85,30 +105,38 @@ efi_main:
     lsl   x11, x12, x11
     sub   x12, x11, #1
     bic   x8,  x9,  x12
-4:
+6:
     dc    cvac, x8
     add   x8,  x8,  x11
     cmp   x8,  x10
-    b.lo  4b
+    b.lo  6b
 
-    /* 4b. clean the payload range to PoC (its length is small: 66 KB) */
-    adrp  x9, PayloadImage
-    add   x9, x9, :lo12:PayloadImage
+    /* clean the PAYLOAD DESTINATION range to PoC */
+    ldr   x9,  =PAYLOAD_BASE
     adrp  x10, PayloadEnd
     add   x10, x10, :lo12:PayloadEnd
-    bic   x8, x9, x12
-5:
+    adrp  x11, PayloadImage
+    add   x11, x11, :lo12:PayloadImage
+    sub   x10, x10, x11          /* payload length */
+    add   x10, x9, x10
+    mrs   x11, ctr_el0
+    ubfx  x11, x11, #16, #4
+    mov   x12, #4
+    lsl   x11, x12, x11
+    sub   x12, x11, #1
+    bic   x8,  x9,  x12
+7:
     dc    cvac, x8
     add   x8,  x8,  x11
     cmp   x8,  x10
-    b.lo  5b
+    b.lo  7b
 
     dsb   sy
     ic    iallu
     dsb   sy
     isb
 
-    /* 4c. stop timers + GIC, mask IRQs */
+    /* mask IRQs, stop timers, disable GIC */
     msr   daifset, #0xf
     msr   cntp_ctl_el0, xzr
     msr   cntv_ctl_el0, xzr
@@ -117,7 +145,7 @@ efi_main:
     str   wzr, [x9]
     dsb   sy
 
-    /* 5. MMU + caches off, jump to the FD */
+    /* MMU + caches off, jump to the FD */
     mrs   x0, sctlr_el1
     bic   x0, x0, #(1 << 0)
     bic   x0, x0, #(1 << 2)

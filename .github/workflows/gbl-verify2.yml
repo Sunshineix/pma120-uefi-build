@@ -2,6 +2,11 @@ name: gbl-verify2 (BootstrapVerify2: FD + payload)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - probe/BootstrapVerify2.S
+      - .github/workflows/gbl-verify2.yml
 
 jobs:
   build-verify2:

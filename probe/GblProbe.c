@@ -1,10 +1,11 @@
-/* GblProbe.c v2 — EFI PE probe for gbl-chainload's `oem boot-efi`.
-   Design rules learned from v1 (black screen): NO ConOut, NO Print, paint FIRST.
-   - Locate GOP via BootServices (LocateProtocol at offset 296, spec-layout).
-   - Paint top half red / bottom half blue directly into the GOP framebuffer
-     (covers both BGRx/RGBx orders: one band is red, the other blue either way).
-   - Stall 60s so the bands stay visible, then RETURN to GBL's fastboot UI.
-     If GBL's UI comes back, our PE ran cleanly end-to-end. */
+/* GblProbe.c v3 — paint the VISIBLE buffer first.
+   GBL's fastboot menu is drawn into the splash buffer (dtb reserved-memory
+   splash_region @ 0xFC800000) — that is the scanout during bootloader phase.
+   v2 painted the GOP framebuffer which is NOT scanned out, hence invisible.
+   v3: 1) paint 0xFC800000 (red top / white middle / blue bottom),
+       2) then paint GOP framebuffer with the same pattern (belt & braces),
+       3) stall 30s, 4) return so GBL resumes (fastboot dies per Finished=TRUE,
+          user recovers via long power press). */
 typedef unsigned long long UINT64;
 typedef unsigned int       UINT32;
 typedef unsigned short     UINT16;
@@ -21,8 +22,6 @@ typedef struct {
   UINT8  Data4[8];
 } EFI_GUID;
 
-/* EFI_SYSTEM_TABLE: 24-byte header, then ConIn(24), ConOut(32), StdErr(40),
-   RuntimeServices(48), BootServices(56). */
 typedef struct {
   UINT64 Hdr[3];
   VOID  *ConIn;
@@ -32,11 +31,9 @@ typedef struct {
   VOID  *BootServices;
 } EFI_SYSTEM_TABLE;
 
-/* EFI_BOOT_SERVICES: LocateProtocol at offset 296, Stall at offset 224. */
 typedef EFI_STATUS (*EFI_LOCATE_PROTOCOL)(EFI_GUID *, VOID *, VOID **);
 typedef VOID       (*EFI_STALL)(UINTN);
 
-/* GOP: QueryMode(0) SetMode(8) Blt(16) Mode(24) */
 typedef struct {
   UINT32 Version;
   UINT32 HorizontalResolution;
@@ -61,11 +58,24 @@ typedef struct {
   GOP_MODE *Mode;
 } GOP_PROTO;
 
-/* 9042A9DE-23DC-4A38-96FB-7ADED080516A */
 static const EFI_GUID GopGuid = {
   0x9042A9DE, 0x23DC, 0x4A38,
   { 0x96, 0xFB, 0x7A, 0xDE, 0xD0, 0x80, 0x51, 0x6A }
 };
+
+/* Paint red/white/blue bands at Base with resolution WxH and stride S. */
+static void Paint(UINT32 *Base, UINTN W, UINTN H, UINTN S)
+{
+  UINTN x, y;
+  for (y = 0; y < H; y++) {
+    UINT32  c;
+    UINT32 *row = Base + y * S;
+    if (y < H / 2)         c = 0x00FF0000u;      /* red   */
+    else if (y < H / 2 + H / 10) c = 0xFFFFFFFFu; /* white stripe */
+    else                   c = 0x000000FFu;      /* blue  */
+    for (x = 0; x < W; x++) row[x] = c;
+  }
+}
 
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *ST)
 {
@@ -74,23 +84,21 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *ST)
       *(EFI_LOCATE_PROTOCOL *)((UINT8 *)ST->BootServices + 296);
   EFI_STALL Stall = *(EFI_STALL *)((UINT8 *)ST->BootServices + 224);
   GOP_PROTO *Gop = 0;
-  EFI_STATUS st = Locate((EFI_GUID *)&GopGuid, 0, (VOID **)&Gop);
 
-  /* Paint FIRST, before anything else can go wrong. */
-  if (st == 0 && Gop != 0 && Gop->Mode != 0 && Gop->Mode->Info != 0) {
-    UINTN   W = Gop->Mode->Info->HorizontalResolution;
-    UINTN   H = Gop->Mode->Info->VerticalResolution;
-    UINTN   S = Gop->Mode->Info->PixelsPerScanLine;
-    UINT32 *Fb = (UINT32 *)(UINTN)Gop->Mode->FrameBufferBase;
-    UINTN   x, y;
-    for (y = 0; y < H; y++) {
-      UINT32   c = (y < H / 2) ? 0x00FF0000u : 0x000000FFu;
-      UINT32  *row = Fb + y * S;
-      for (x = 0; x < W; x++) row[x] = c;
+  /* 1) The visible buffer: splash_region from our dtb. 1440x3168. */
+  Paint((UINT32 *)(UINTN)0xFC800000UL, 1440, 3168, 1440);
+
+  /* 2) GOP framebuffer, same pattern. */
+  {
+    EFI_STATUS st = Locate((EFI_GUID *)&GopGuid, 0, (VOID **)&Gop);
+    if (st == 0 && Gop != 0 && Gop->Mode != 0 && Gop->Mode->Info != 0) {
+      Paint((UINT32 *)(UINTN)Gop->Mode->FrameBufferBase,
+            Gop->Mode->Info->HorizontalResolution,
+            Gop->Mode->Info->VerticalResolution,
+            Gop->Mode->Info->PixelsPerScanLine);
     }
   }
 
-  /* Keep bands visible, then return so GBL resumes its fastboot UI. */
-  Stall(60 * 1000 * 1000);
+  Stall(30 * 1000 * 1000);
   return 0;
 }

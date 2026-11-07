@@ -78,20 +78,20 @@ APRIORI DXE {
 
   INF Binaries/pma120/QcomPkg/Drivers/SPIDxe/SPIDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/PmicGlinkDxe/PmicGlinkSoccpDxe.inf
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/QcomChargerDxe/QcomChargerDxeLAGio.inf
   INF Binaries/pma120/QcomPkg/Drivers/ChargerExDxe/ChargerExDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UsbfnDwc3Dxe/UsbfnDwc3Dxe.inf
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.inf
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/XhciDxe/XhciDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/XhciDxe/XhciDxe.inf
 
-# [xnu-test] INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-# [xnu-test] INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-# [xnu-test] INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UsbDeviceDxe/UsbDeviceDxe.inf
-# [xnu-test] INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.inf
 
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1

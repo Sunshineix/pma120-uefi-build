@@ -62,7 +62,8 @@ jobs:
           mkdir -p artifacts
           cp Build/pma120Pkg/RELEASE_CLANGPDB/FV/SILICIUM_UEFI.fd artifacts/ 2>/dev/null || \
             find Build/pma120Pkg -name '*.fd' -exec cp {} artifacts/ \;
-          cp Mu-pma120.img artifacts/ 2>/dev/null || true
+          cp Mu-pma120*.img artifacts/ 2>/dev/null || true
+          cp Mu-pma120*.bin artifacts/ 2>/dev/null || true
           ls -la artifacts
 
       - name: Upload firmware

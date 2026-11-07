@@ -14,6 +14,8 @@ SECTIONS
   .gcc_except_table : { *(.gcc_except_table*) }
   . = ALIGN(4096);
   .fd : { *(.fd) }
+  .payload : { *(.payload) }
+  .loader : { *(.loader) }
   . = ALIGN(4096);
   .text : {
     _text = .;

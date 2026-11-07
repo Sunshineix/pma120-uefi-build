@@ -101,6 +101,7 @@ InitializeMemory (VOID)
   // Save UEFI Memory Details
   UINTN UefiMemoryBase = UefiMemoryRegion.Address;
   UINTN UefiMemorySize = UefiMemoryRegion.Length;
+  DEBUG ((EFI_D_WARN, "SEC: DXE heap at 0x%llx size 0x%llx\n", (UINT64)UefiMemoryBase, (UINT64)UefiMemorySize));
 
   // Verify UEFI Memory Base
   if (UefiMemoryBase == 0 && UefiMemorySize == 0) {
@@ -111,8 +112,10 @@ InitializeMemory (VOID)
   // Initialize HOB List
   HobList = HobConstructor ((VOID *)UefiMemoryBase, UefiMemorySize, (VOID *)UefiMemoryBase, (VOID *)(UefiMemoryBase + UefiMemorySize));
   PrePeiSetHobList (HobList);
+  DEBUG ((EFI_D_WARN, "SEC: HOB list built\n"));
 
   // Initialize MMU & Memory HOBs
+  DEBUG ((EFI_D_WARN, "SEC: memory peim start\n"));
   Status = MemoryPeim (UefiMemoryBase, UefiMemorySize);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -132,6 +135,7 @@ SecMain (VOID)
 
   // Do Platform Specific Initialization
   PlatformInitialize ();
+  DEBUG ((EFI_D_WARN, "SEC: platform init done\n"));
 
 #ifndef MDEPKG_NDEBUG
   // Initialize Serial Port
@@ -139,13 +143,16 @@ SecMain (VOID)
   if (EFI_ERROR (Status)) {
     return;
   }
+  DEBUG ((EFI_D_WARN, "SEC: serial done\n"));
 
   // Print Firmware Version
   PrintFirmwareVersion ();
 
   // Initialize Debug Agent
   InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
+  DEBUG ((EFI_D_WARN, "SEC: debug agent done\n"));
   SaveAndSetDebugTimerInterrupt (TRUE);
+  DEBUG ((EFI_D_WARN, "SEC: debug timer done\n"));
 #endif
 
   // Initialize Memory

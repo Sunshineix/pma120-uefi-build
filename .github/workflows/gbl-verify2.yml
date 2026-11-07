@@ -1,4 +1,4 @@
-name: gbl-verify2 (BootstrapVerify2: FD + payload)
+name: gbl-verify2 (BootstrapVerify2 FD and payload)
 
 on:
   workflow_dispatch:

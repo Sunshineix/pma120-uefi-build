@@ -1,0 +1,41 @@
+name: gbl-xnu (FD + XNUP payload carrier)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-fdxnu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install ARM64 cross toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gcc-aarch64-linux-gnu
+
+      - name: Compile BootstrapFdXnu.efi
+        run: |
+          set -euo pipefail
+          cd probe
+          ls -la
+          aarch64-linux-gnu-gcc -c crt0.S -o crt0.o
+          aarch64-linux-gnu-gcc -c BootstrapFdXnu.S -o FdXnu.o
+          aarch64-linux-gnu-ld -shared -Bsymbolic -T gblprobe.lds \
+            crt0.o FdXnu.o -o BootstrapFdXnu.so
+          aarch64-linux-gnu-objcopy -j .text -j .data -j .rodata \
+            -j .dynamic -j .rela -j .reloc -j .fd -j .payload \
+            --target=efi-app-aarch64 BootstrapFdXnu.so BootstrapFdXnu.efi \
+            || aarch64-linux-gnu-objcopy -j .text -j .data -j .rodata \
+               -j .dynamic -j .reloc -j .fd -j .payload \
+               --target=efi-app-aarch64 BootstrapFdXnu.so BootstrapFdXnu.efi
+          ls -la BootstrapFdXnu.efi
+          echo "--- PE header ---"
+          xxd -l 96 BootstrapFdXnu.efi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gbl-fdxnu
+          path: probe/BootstrapFdXnu.efi

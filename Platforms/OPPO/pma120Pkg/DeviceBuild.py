@@ -37,7 +37,8 @@ class CommonPlatform ():
         "Silicon/Qualcomm",
         "Silicon/Silicium",
         "Silicium-ACPI",
-        "Silicium-ACPI/Platforms/OPPO",
+        # X9U-iOS: Silicium-ACPI 灏氭棤 Platforms/OPPO锛涘鐢ㄥ悓 SoC锛圫M8850锛夌殑 OnePlus ACPI 琛?
+        "Silicium-ACPI/Platforms/OnePlus",
         "Silicium-ACPI/Silicon/Qualcomm"
     )
 

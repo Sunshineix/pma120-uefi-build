@@ -97,7 +97,7 @@ INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF Binaries/pma120/QcomPkg/Drivers/DisplayDxe/DisplayDxe.inf
 !else
-  INF SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe.inf
+  # [xnu] SimpleFbDxe: crashes on this board; Pma120XnuDxe installs the GOP instead
   INF Platforms/OPPO/pma120Pkg/Drivers/Pma120XnuDxe/Pma120XnuDxe.inf
 !endif
 

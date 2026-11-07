@@ -19,18 +19,19 @@ jobs:
         run: |
           set -euo pipefail
           cd probe
-          aarch64-linux-gnu-gcc -c -I/usr/include/efi -I/usr/include/efi/aarch64 \
-            -fPIC -ffreestanding -fno-stack-protector -fshort-wchar -mstrict-align \
-            -g0 -O2 -Wall GblProbe.c -o GblProbe.o
-          aarch64-linux-gnu-ld -shared -Bsymbolic -L/usr/lib \
-            -T /usr/lib/gnuefi/elf_aarch64_efi.lds \
-            /usr/lib/gnuefi/crt0-efi-aarch64.o GblProbe.o \
-            -o GblProbe.so -lnosys -lgnuefi -lefi
+          aarch64-linux-gnu-gcc -c -ffreestanding -fno-stack-protector -fPIC \
+            -mstrict-align -g0 -O2 -Wall GblProbe.c -o GblProbe.o
+          CRT0=$(find /usr/lib -name crt0-efi-aarch64.o 2>/dev/null | head -1)
+          LDS=$(find /usr/lib -name elf_aarch64_efi.lds 2>/dev/null | head -1)
+          echo "CRT0=$CRT0"
+          echo "LDS=$LDS"
+          test -n "$CRT0" -a -n "$LDS"
+          aarch64-linux-gnu-ld -shared -Bsymbolic -T "$LDS" "$CRT0" \
+            GblProbe.o -o GblProbe.so
           objcopy -j .text -j .sdata -j .data -j .rodata \
             -j .dynamic -j .dynsym -j .rel -j .rela -j .reloc \
             --target=efi-app-aarch64 GblProbe.so GblProbe.efi
           ls -la GblProbe.efi
-          file GblProbe.efi || true
 
       - name: Upload probe artifact
         uses: actions/upload-artifact@v4

@@ -1,0 +1,27 @@
+#
+# Boot Shim Configs
+#
+[boot_shim]
+requires_kernel_header = true
+
+#
+# UEFI FD Configs
+# 同 infiniti（SM8850）：FD 0xC6900000 / 3 MiB，与 pma120Pkg MemoryMapLib 的 UEFI_FD 条目一致
+#
+[uefi_fd]
+base = 0xC6900000
+size = 0x300000
+
+#
+# Android Boot Image Kernel Configs
+#
+[boot_image_kernel]
+kernel_compression = "gzip"
+append_dtb         = true
+
+#
+# Android Boot Image Configs
+# SM8850 boot image header v4（同 infiniti）
+#
+[boot_image]
+header_version = 4

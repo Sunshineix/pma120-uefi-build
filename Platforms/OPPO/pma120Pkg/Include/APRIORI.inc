@@ -13,6 +13,8 @@ APRIORI DXE {
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
+  INF Platforms/OPPO/pma120Pkg/Drivers/Pma120Diag/Pma120Diag.inf
+
   INF Binaries/pma120/QcomPkg/Drivers/SmemDxe/SmemDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/DALSYSDxe/DALSYSDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/HWIODxe/HWIODxe.inf

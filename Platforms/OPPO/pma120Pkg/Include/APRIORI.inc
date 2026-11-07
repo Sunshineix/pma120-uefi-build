@@ -59,7 +59,7 @@ APRIORI DXE {
 
   INF Binaries/pma120/QcomPkg/Drivers/DDRInfoDxe/DDRInfoDxe.inf
   #INF Binaries/pma120/QcomPkg/Drivers/OcdtDxe/OplusProject.inf
-  INF Binaries/pma120/QcomPkg/Drivers/OplusExGpio/TLMMExDxe.inf
+  #INF Binaries/pma120/QcomPkg/Drivers/OplusExGpio/TLMMExDxe.inf
   #INF Binaries/pma120/QcomPkg/Drivers/FeatureEnablerDxe/FeatureEnablerDxe.inf
   #INF Binaries/pma120/QcomPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
   #INF Binaries/pma120/QcomPkg/Drivers/PILDxe/PILDxe.inf

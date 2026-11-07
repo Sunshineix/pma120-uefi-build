@@ -49,7 +49,7 @@ APRIORI DXE {
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   INF Binaries/pma120/QcomPkg/Drivers/SdccDxe/SdccDxe.inf
-  INF Binaries/pma120/QcomPkg/Drivers/UFSDxe/UFSDxe.inf
+  #INF Binaries/pma120/QcomPkg/Drivers/UFSDxe/UFSDxe.inf
 
   INF FatPkg/EnhancedFatDxe/Fat.inf
 

@@ -1,4 +1,4 @@
-﻿  INF MdeModulePkg/Core/Dxe/DxeMain.inf
+  INF MdeModulePkg/Core/Dxe/DxeMain.inf
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
   INF Binaries/pma120/QcomPkg/Drivers/EnvDxe/EnvDxeEnhanced.inf

@@ -10,10 +10,10 @@ jobs:
       - name: Checkout probe sources
         uses: actions/checkout@v4
 
-      - name: Install ARM64 cross toolchain + gnu-efi
+      - name: Install ARM64 cross toolchain
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq gcc-aarch64-linux-gnu gnu-efi
+          sudo apt-get install -y -qq gcc-aarch64-linux-gnu
 
       - name: Compile GblProbe.efi
         run: |
@@ -21,17 +21,15 @@ jobs:
           cd probe
           aarch64-linux-gnu-gcc -c -ffreestanding -fno-stack-protector -fPIC \
             -mstrict-align -g0 -O2 -Wall GblProbe.c -o GblProbe.o
-          CRT0=$(find /usr/lib -name crt0-efi-aarch64.o 2>/dev/null | head -1)
-          LDS=$(find /usr/lib -name elf_aarch64_efi.lds 2>/dev/null | head -1)
-          echo "CRT0=$CRT0"
-          echo "LDS=$LDS"
-          test -n "$CRT0" -a -n "$LDS"
-          aarch64-linux-gnu-ld -shared -Bsymbolic -T "$LDS" "$CRT0" \
-            GblProbe.o -o GblProbe.so
-          objcopy -j .text -j .sdata -j .data -j .rodata \
-            -j .dynamic -j .dynsym -j .rel -j .rela -j .reloc \
+          aarch64-linux-gnu-gcc -c crt0.S -o crt0.o
+          aarch64-linux-gnu-ld -shared -Bsymbolic -T gblprobe.lds \
+            crt0.o GblProbe.o -o GblProbe.so
+          aarch64-linux-gnu-objcopy -j .text -j .rodata -j .data \
+            -j .got -j .dynamic -j .rela -j .reloc \
             --target=efi-app-aarch64 GblProbe.so GblProbe.efi
           ls -la GblProbe.efi
+          echo "--- PE header check ---"
+          xxd GblProbe.efi | head -8
 
       - name: Upload probe artifact
         uses: actions/upload-artifact@v4

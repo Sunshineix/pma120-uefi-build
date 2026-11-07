@@ -1,6 +1,6 @@
 ## @file Pma120Diag.inf
-#  pma120 diagnostic DXE driver: paints the GOP framebuffer with red/white/blue
-#  bands and prints "PMA120 DXE ALIVE" so on-device bring-up progress is visible.
+#  pma120 diagnostic DXE driver v2: splash-framebuffer heartbeat animation.
+#  Depex TRUE so it runs at the start of DXE dispatch regardless of display state.
 #  Copyright (c) 2026, X9U iOS Port Project. All rights reserved.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -10,7 +10,7 @@
   BASE_NAME                      = Pma120Diag
   FILE_GUID                      = E08F4E41-1E40-47FD-BF78-5E5E84128B1A
   MODULE_TYPE                    = DXE_DRIVER
-  VERSION_STRING                 = 1.0
+  VERSION_STRING                 = 2.0
   ENTRY_POINT                    = Pma120DiagEntry
 
 [Sources]
@@ -23,12 +23,8 @@
 [LibraryClasses]
   UefiDriverEntryPoint
   UefiBootServicesTableLib
-  UefiLib
   DebugLib
-  PrintLib
-
-[Protocols]
-  gEfiGraphicsOutputProtocolGuid
+  UefiLib
 
 [Depex]
-  gEfiGraphicsOutputProtocolGuid
+  TRUE

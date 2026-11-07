@@ -28,19 +28,19 @@ typedef struct {
 } EFI_SYSTEM_TABLE;
 
 /* EFI_BOOT_SERVICES function pointers used here (spec offsets) */
-typedef EFI_STATUS (*EFI_IMAGE_LOAD)(UINT8 BootPolicy, EFI_HANDLE ParentImageHandle,
-                                     VOID *DevicePath, VOID *SourceBuffer,
-                                     UINTN SourceSize, EFI_HANDLE *ImageHandle);
-typedef EFI_STATUS (*EFI_IMAGE_START)(EFI_HANDLE ImageHandle, UINTN *ExitDataSize,
-                                      UINT16 **ExitData);
-typedef EFI_STATUS (*EFI_LOCATE_PROTOCOL)(EFI_GUID *, VOID *, VOID **);
-
 typedef struct {
   UINT32 Data1;
   UINT16 Data2;
   UINT16 Data3;
   UINT8  Data4[8];
 } EFI_GUID;
+
+typedef EFI_STATUS (*EFI_IMAGE_LOAD)(UINT8 BootPolicy, EFI_HANDLE ParentImageHandle,
+                                     VOID *DevicePath, VOID *SourceBuffer,
+                                     UINTN SourceSize, EFI_HANDLE *ImageHandle);
+typedef EFI_STATUS (*EFI_IMAGE_START)(EFI_HANDLE ImageHandle, UINTN *ExitDataSize,
+                                      UINT16 **ExitData);
+typedef EFI_STATUS (*EFI_LOCATE_PROTOCOL)(EFI_GUID *, VOID *, VOID **);
 
 /* QCOM_USB_DEVICE_GUID: d9d9ce48-44b8-4f49-8e3e-2a3b927dc6c1 */
 static const EFI_GUID UsbDeviceGuid = {

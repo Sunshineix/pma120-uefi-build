@@ -37,6 +37,8 @@
 !include KaanapaliPkg/KaanapaliPkg.dsc.inc
 
 [PcdsFixedAtBuild]
+  # GBL chain: no XBL hand-off exists; never scan the FD_Reserved window or call stale stock code (flaky hangs) - XnuDxe/loader do not read these HOBs.
+  gQcomPkgTokenSpaceGuid.PcdBuildXblHobs|FALSE
   #
   # DDR Memory
   #

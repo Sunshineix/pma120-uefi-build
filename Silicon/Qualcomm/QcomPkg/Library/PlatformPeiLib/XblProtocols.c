@@ -107,6 +107,15 @@ GetXblHobAddresses (
   OUT EFI_PHYSICAL_ADDRESS *SchedulerInterfaceAddr,
   OUT EFI_PHYSICAL_ADDRESS *DtbExtensionAddr)
 {
+  /* pma120 (GBL chain): XBL never handed anything over to this firmware.
+   * The stock "FD Reserved" window scan below would read stale memory,
+   * parse it as code and call into it - a flaky hang. Return nothing:
+   * the caller still builds the InfoBlk/Shim/Prodmode HOBs the vendor
+   * drivers expect, and skips the scheduler/FV-list/DTB-extension HOBs
+   * (no reader of them in this dispatch). */
+  *SchedulerInterfaceAddr = 0;
+  *DtbExtensionAddr = 0;
+#if 0
   EFI_MEMORY_REGION_DESCRIPTOR ReservedFd = {0};
 
   // Locate Reserved FD Region
@@ -140,4 +149,5 @@ GetXblHobAddresses (
       *DtbExtensionAddr = ParseHobFunction (Current, &gEfiDtbExtensionHobGuid);
     }
   }
+#endif
 }

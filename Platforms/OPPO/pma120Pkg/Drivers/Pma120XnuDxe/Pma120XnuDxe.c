@@ -14,10 +14,32 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/CacheMaintenanceLib.h>
 
 #define PAYLOAD_BASE  0xC7800000ULL
 #define PAYLOAD_MAGIC 0x50554E58u  /* "XNUP" */
 #define PAYLOAD_MAX   0x04000000u  /* loader.c: PAYLOAD_MAX_SIZE */
+
+/* Splash framebuffer (panel scanout): every paint must flush the cache. */
+#define MARK_BASE  0xFC800000ULL
+#define MARK_W     1440ULL
+#define MARK_H     3168ULL
+
+static
+VOID
+Paint (
+  IN UINT32  Color
+  )
+{
+  volatile UINT32  *Fb = (volatile UINT32 *)(UINTN)MARK_BASE;
+  UINTN             Total = MARK_W * MARK_H;
+  UINTN             i;
+
+  for (i = 0; i < Total; i++) {
+    Fb[i] = Color;
+  }
+  WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)MARK_BASE, Total * 4);
+}
 
 typedef struct {
   UINT32 Magic;
@@ -63,8 +85,11 @@ Pma120XnuDxeEntry (
   EFI_HANDLE    LoaderHandle = NULL;
   EFI_STATUS    Status;
 
+  Paint (0x00FFFF00u);  /* cyan: XnuDxe entered */
+
   Hdr = (XNUP_HEADER *)(UINTN)PAYLOAD_BASE;
   if (Hdr->Magic != PAYLOAD_MAGIC) {
+    Paint (0x00FF00FFu);  /* magenta: no payload at PAYLOAD_BASE */
     DEBUG ((DEBUG_ERROR, "Pma120XnuDxe: no XNUP payload at 0x%lx (magic 0x%x)\n",
             PAYLOAD_BASE, Hdr->Magic));
     return EFI_NOT_FOUND;
@@ -102,11 +127,14 @@ Pma120XnuDxeEntry (
 
   Status = gBS->LoadImage (FALSE, ImageHandle, NULL, Loader, LoaderSize, &LoaderHandle);
   if (EFI_ERROR (Status)) {
+    Paint (0x00FF7F00u);  /* orange: LoadImage failed */
     DEBUG ((DEBUG_ERROR, "Pma120XnuDxe: LoadImage failed: %r\n", Status));
     return Status;
   }
 
+  Paint (0x000000FFu);  /* blue: LoadImage ok, starting */
   Status = gBS->StartImage (LoaderHandle, NULL, NULL);
+  Paint (0x0000FFFFu);  /* yellow: the loader returned */
   DEBUG ((DEBUG_WARN, "Pma120XnuDxe: loader returned: %r\n", Status));
   return Status;
 }

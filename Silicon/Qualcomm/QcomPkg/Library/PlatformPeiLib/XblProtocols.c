@@ -42,14 +42,16 @@ ParseAddInstruction (
 EFI_PHYSICAL_ADDRESS
 ParseHobFunction (
   IN EFI_PHYSICAL_ADDRESS  FunctionStart,
-  IN EFI_GUID             *ProtocolGuid)
+  IN EFI_GUID             *ProtocolGuid,
+  IN EFI_PHYSICAL_ADDRESS  Limit)
 {
   EFI_PHYSICAL_ADDRESS ProtocolAddress  = 0;
   UINT64               AdrpRegValue[32] = {0};
   BOOLEAN              GuidMatched      = FALSE;
 
-  // Go thru the HOB Function
-  for (EFI_PHYSICAL_ADDRESS Current = FunctionStart;; Current += ARM64_INSTRUCTION_LENGTH) {
+  // Go thru the HOB Function (bounded: the stock code region; a stale copy without a RET
+  // must not read on - the phone's FD_Reserved can hold anything)
+  for (EFI_PHYSICAL_ADDRESS Current = FunctionStart; Current < Limit; Current += ARM64_INSTRUCTION_LENGTH) {
     // Get Current Instruction
     UINT32 Instruction = ARM64_INSTRUCTION (Current);
 
@@ -107,15 +109,6 @@ GetXblHobAddresses (
   OUT EFI_PHYSICAL_ADDRESS *SchedulerInterfaceAddr,
   OUT EFI_PHYSICAL_ADDRESS *DtbExtensionAddr)
 {
-  /* pma120 (GBL chain): XBL never handed anything over to this firmware.
-   * The stock "FD Reserved" window scan below would read stale memory,
-   * parse it as code and call into it - a flaky hang. Return nothing:
-   * the caller still builds the InfoBlk/Shim/Prodmode HOBs the vendor
-   * drivers expect, and skips the scheduler/FV-list/DTB-extension HOBs
-   * (no reader of them in this dispatch). */
-  *SchedulerInterfaceAddr = 0;
-  *DtbExtensionAddr = 0;
-#if 0
   EFI_MEMORY_REGION_DESCRIPTOR ReservedFd = {0};
 
   // Locate Reserved FD Region
@@ -141,13 +134,12 @@ GetXblHobAddresses (
 
     // Get Scheduler Protocol Address
     if (*SchedulerInterfaceAddr == 0) {
-      *SchedulerInterfaceAddr = ParseHobFunction (Current, &gEfiSchedulerInterfaceHobGuid);
+      *SchedulerInterfaceAddr = ParseHobFunction (Current, &gEfiSchedulerInterfaceHobGuid, ReservedFd.Address + ReservedFd.Length);
     }
 
     // Get DTB Extension Protocol Address
     if (*DtbExtensionAddr == 0) {
-      *DtbExtensionAddr = ParseHobFunction (Current, &gEfiDtbExtensionHobGuid);
+      *DtbExtensionAddr = ParseHobFunction (Current, &gEfiDtbExtensionHobGuid, ReservedFd.Address + ReservedFd.Length);
     }
   }
-#endif
 }

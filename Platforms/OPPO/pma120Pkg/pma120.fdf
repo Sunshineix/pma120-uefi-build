@@ -105,7 +105,6 @@ INF UniXNUPkg/Application/UniXNU/UniXNU.inf
 INF UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe.inf
 INF DarwinBootPkg/Driver/DarwinBoot.inf
 INF UniXNUPkg/Driver/UniXNURamDiskDxe/UniXNURamDiskDxe.inf
-INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF FatPkg/EnhancedFatDxe/Fat.inf
   FILE FREEFORM = 25462CDA-221F-47DF-AC1D-259CFAA4E326 {
     SECTION RAW = pma120Pkg/FdtBlob/pma120.dtb

@@ -83,6 +83,7 @@
 
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+  UniXNULib|UniXNUPkg/Library/UniXNULib/UniXNULib.inf
 
 [Components]
 

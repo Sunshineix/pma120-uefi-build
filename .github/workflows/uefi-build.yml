@@ -20,8 +20,9 @@ jobs:
           git clone -q --depth 1 https://github.com/Project-Silicium/Silicium-ACPI.git Silicium-ACPI
 
           # UniXNU firmware modules (boot menu, XNU loader, FAT payload volume)
-          git clone -q https://github.com/UniXNU/UniXNU.git UniXNU-src
-          git -C UniXNU-src checkout -q be0e4fab0072bceaa8d744a4a6875ba5461cd7ff
+          git clone -q --no-checkout https://github.com/UniXNU/UniXNU.git UniXNU-src
+          git -C UniXNU-src fetch -q --depth 1 origin be0e4fab0072bceaa8d744a4a6875ba5461cd7ff
+          git -C UniXNU-src checkout -q FETCH_HEAD
           cp -r UniXNU-src/package/UniXNUPkg UniXNUPkg
           git clone -q --depth 1 https://github.com/UniXNU/DarwinBoot.git DB-src
           cp -r DB-src/DarwinBootPkg DarwinBootPkg

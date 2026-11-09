@@ -91,7 +91,7 @@ INF Binaries/pma120/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
 
 INF Binaries/pma120/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/UsbDeviceDxe/UsbDeviceDxe.inf
-#INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
+INF Binaries/pma120/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.inf
   INF Platforms/OPPO/pma120Pkg/Drivers/Pma120XnuDxe/Pma120XnuDxe.inf
   INF Binaries/pma120/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.inf
 

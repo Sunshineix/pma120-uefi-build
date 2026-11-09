@@ -81,7 +81,17 @@
   #
   ConfigurationMapLib|pma120Pkg/Library/ConfigurationMapLib/ConfigurationMapLib.inf
 
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+
 [Components]
+
+  UniXNUPkg/Application/UniXNU/UniXNU.inf
+  UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe.inf
+  DarwinBootPkg/Driver/DarwinBoot.inf
+  UniXNUPkg/Driver/UniXNURamDiskDxe/UniXNURamDiskDxe.inf
+  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  FatPkg/EnhancedFatDxe/Fat.inf
   #
   # ACPI Tables
   #

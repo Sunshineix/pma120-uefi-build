@@ -85,11 +85,11 @@ Pma120XnuDxeEntry (
   EFI_HANDLE    LoaderHandle = NULL;
   EFI_STATUS    Status;
 
-  Paint (0x00FFFF00u);  /* cyan: XnuDxe entered */
+  Paint (0x0000FFFFu);  /* CYAN: XnuDxe entered */
 
   Hdr = (XNUP_HEADER *)(UINTN)PAYLOAD_BASE;
   if (Hdr->Magic != PAYLOAD_MAGIC) {
-    Paint (0x00FF00FFu);  /* magenta: no payload at PAYLOAD_BASE */
+    Paint (0x00808080u);  /* GRAY: no XNUP payload at PAYLOAD_BASE */
     DEBUG ((DEBUG_ERROR, "Pma120XnuDxe: no XNUP payload at 0x%lx (magic 0x%x)\n",
             PAYLOAD_BASE, Hdr->Magic));
     return EFI_NOT_FOUND;
@@ -127,14 +127,13 @@ Pma120XnuDxeEntry (
 
   Status = gBS->LoadImage (FALSE, ImageHandle, NULL, Loader, LoaderSize, &LoaderHandle);
   if (EFI_ERROR (Status)) {
-    Paint (0x00FF7F00u);  /* orange: LoadImage failed */
+    Paint (0x000000FFu);  /* BLUE: LoadImage failed */
     DEBUG ((DEBUG_ERROR, "Pma120XnuDxe: LoadImage failed: %r\n", Status));
     return Status;
   }
 
-  Paint (0x000000FFu);  /* blue: LoadImage ok, starting */
   Status = gBS->StartImage (LoaderHandle, NULL, NULL);
-  Paint (0x0000FFFFu);  /* yellow: the loader returned */
+  Paint (0x00FFFF00u);  /* YELLOW: the loader returned */
   DEBUG ((DEBUG_WARN, "Pma120XnuDxe: loader returned: %r\n", Status));
   return Status;
 }

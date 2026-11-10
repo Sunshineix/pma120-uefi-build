@@ -9,3 +9,6 @@ BootShim.elf
 
 Mu-*.*
 *:Zone.Identifier
+probe/*.fd
+probe/*.bin
+probe/*.efi

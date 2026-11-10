@@ -1,53 +1,47 @@
-# uefi-sheng
+# pma120-uefi-build
 
-UEFI platform integration for the Xiaomi Pad 6S Pro (sheng, SM8550), using
-Project Silicium and Project Mu.
+UEFI firmware package for **OPPO Find X9 Ultra (pma120, SM8850 "canoe")**, built on
+Project Mu + Project Silicium. It produces the firmware volume used by the UniXNU
+iPadOS 27 bring-up for this device.
 
-The platform supplies memory reservations, board peripherals, display
-handoff, and the firmware volume. UniXNU supplies the boot application and
-DarwinBoot loader. UniXNU-sm8550-common supplies shared XNU platform support.
+## What is in here
 
-- [Firmware integration](https://unixnu.com/porting/uefi-firmware)
-- [sheng device support](https://unixnu.com/devices/sheng)
-- [Build instructions](Building.md)
-- [Platform details](Platforms/Xiaomi/shengPkg/PORTING.md)
-- [Platform status](Status.md)
+| Path | Contents |
+|---|---|
+| `Platforms/OPPO/pma120Pkg` | Device package: `pma120.dsc` / `pma120.fdf`, DXE include lists, `Pma120XnuDxe`, `Pma120Diag`, FDT blob |
+| `Binaries/pma120` | Vendor DXE modules extracted from the stock firmware (research use only) |
+| `Silicon/`, `Common/`, `Silicium-ACPI/`, `Mu_Basecore/` | Mu-Silicium base (git submodules) |
+| `Resources/DTBs` | Reference DTBs for other platforms (upstream) |
+| `probe/` | Legacy EFI staging loaders (HakiOS/XNUP era). The current bring-up uses a standalone carrier image instead |
+| `docs/` | Handoff notes and dead ends. Start with `docs/HANDOFF-20261110.md` |
+| `build_uefi.py` | Build driver |
 
-## Payload firmware
+## Build (WSL)
 
-Build through `./unixnu build firmware --uefi ../uefi-sheng` from UniXNU.
-The DSC and FDF include `UniXNURamDiskDxe`, DiskIoDxe and FAT support so the
-boot-image payload appears as a filesystem. `UniXNURamDiskDxe` is a shared
-module in UniXNU's `package/`, and uses the Mu-Silicium FDT handoff.
-`ShengBootMemoryDxe` supplies the board's memory expansion policy.
-See [required firmware integration](https://unixnu.com/porting/uefi-firmware#required-integration).
+```bash
+python3 -m venv .venv && . .venv/bin/activate
+pip install -r pip-requirements.txt
+python3 build_uefi.py -d pma120 -r DEBUG
+```
 
-## Credits
+Output: `Build/pma120Pkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd`.
+See [Building.md](Building.md) for prerequisites and options.
 
-[Microsoft](https://github.com/microsoft/) for their [Project Mu](https://microsoft.github.io/mu/) which Powers this Project. <br>
-[WOA-Project](https://github.com/WOA-Project/) for their [mu_andromeda_platforms](https://github.com/WOA-Project/mu_andromeda_platforms/) which is used as Base for this Project. <br>
-[Project Aloha](https://github.com/Project-Aloha/) for their [mu_aloha_platforms](https://github.com/Project-Aloha/mu_aloha_platforms/) which is used as Reference for some SoCs. <br>
-[Open Surface RT](https://openrt.gitbook.io/open-surfacert/) for their Help on Tegra Related Stuff.
+## Bring-up status (2026-11-10)
 
-[sonic011gamer](https://github.com/sonic011gamer/) and [halal-beef](https://github.com/halal-beef/) for their Amazing Work on Exynos Related Stuff.
+- Kernel `kernel.macho` (iPadOS 27.0.1 / 24A446, prelinked, 95 MB) builds from the device repo.
+- Firmware boots on hardware to the UniXNU menu; DarwinBoot hands off and the XNU entry code
+  executes (entry-probe blue band). It currently stops before the MMU is enabled (no magenta
+  band) — suspected bootstrap page-table exhaustion with the former 8 GiB DarwinBoot window;
+  a 6 GiB window test is pending.
+- Everything is RAM-only: `fastboot stage` + `fastboot oem boot-efi`. No partition is written.
+
+## Related repositories
+
+- Device port (`board.toml`, DTS, kernel patches): https://github.com/Sunshineix/UniXNU-pma120
+- Upstream UniXNU: https://github.com/UniXNU/UniXNU
 
 ## License
 
-All code except drivers in `GPLDrivers` & `GPLApplications` & `GPLLibrary` directories are licensed under BSD-2-Clause. <br />
-GPL Drivers are licensed under `GPLv2` or later license.
-
-## Device porting record
-
-The firmware section of [sheng's porting record](https://unixnu.com/devices/sheng#firmware)
-records handoff inputs, development findings, evidence and completion criteria.
-Update `UniXNU-sheng/porting.toml` when firmware work changes those inputs or
-results. Maintainers and agents use the [same workflow](https://unixnu.com/porting/records).
-
-## Local build inputs
-
-Save device paths and boot arguments in `unixnu.local.toml` in the UniXNU
-checkout. See the [configuration reference](https://unixnu.com/reference/configuration#local-build-inputs).
-Then use `./unixnu kernel`, `./unixnu firmware`, `./unixnu payload`, and
-`./unixnu bootimg`. Argument changes require rebuilding the payload and boot
-image. See [boot arguments](https://unixnu.com/xnu/boot-arguments#apply-arguments)
-and [green-bar diagnosis](https://unixnu.com/guide/debugging#green-bar).
+BSD-2-Clause-Patent; see [LICENSE](LICENSE). Modules under `Binaries/` remain the property of
+their vendors and are included for interoperability research only.
